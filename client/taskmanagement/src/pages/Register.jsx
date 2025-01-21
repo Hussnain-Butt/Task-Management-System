@@ -14,7 +14,7 @@ const Register = () => {
   const handleRegister = async (e) => {
     e.preventDefault();
     try {
-      await axios.post('/auth/register', formData);
+      await axios.post('https://task-management-system-frontend-phi.vercel.app/auth/register')
       navigate('/login'); // Redirect to login page after successful registration
     } catch (err) {
       setError(err.response?.data?.error || 'Registration failed.');

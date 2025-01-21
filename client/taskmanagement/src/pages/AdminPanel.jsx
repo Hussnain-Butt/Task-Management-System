@@ -14,7 +14,7 @@ const AdminPanel = () => {
   // Fetch users
   const fetchUsers = async () => {
     try {
-      const response = await axios.get('/auth/users', {
+      const response = await axios.get('https://task-management-system-frontend-phi.vercel.app/auth/users',{
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setUsers(response.data || []);
@@ -37,7 +37,7 @@ const AdminPanel = () => {
         bgColor: taskGroup.bgColor,
       };
 
-      await axios.post('/tasks', payload, {
+      await axios.post('https://task-management-system-frontend-phi.vercel.app/tasks',{
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
