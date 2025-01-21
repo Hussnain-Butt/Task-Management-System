@@ -62,17 +62,32 @@ exports.getTasks = async (req, res) => {
 };
 
 
-  exports.updateTask = async (req, res) => {
-    try {
-      const updatedTask = await Task.findByIdAndUpdate(req.params.id, req.body, { new: true });
-      if (!updatedTask) {
-        return res.status(404).json({ error: 'Task not found' });
-      }
-      res.json(updatedTask);
-    } catch (err) {
-      res.status(400).json({ error: 'Error updating task' });
+exports.updateTask = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { title, subtasks, deadline, bgColor } = req.body;
+
+    const updatedTask = await Task.findByIdAndUpdate(
+      id,
+      {
+        title,
+        subtasks,
+        deadline,
+        bgColor,
+      },
+      { new: true } // Return the updated task
+    );
+
+    if (!updatedTask) {
+      return res.status(404).json({ error: 'Task not found' });
     }
-  };
+
+    res.status(200).json(updatedTask);
+  } catch (error) {
+    console.error('Error updating task:', error.message);
+    res.status(500).json({ error: 'Failed to update task' });
+  }
+};
 
   exports.updateTaskStatus = async (req, res) => {
     try {

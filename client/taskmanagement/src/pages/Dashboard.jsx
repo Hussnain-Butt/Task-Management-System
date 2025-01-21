@@ -1,21 +1,21 @@
 import React, { useEffect, useState } from 'react';
 import axios from '../services/api';
 import TaskCard from '../components/TaskCard';
+import EditTaskModal from '../components/EditTaskModel';
 
 const Dashboard = () => {
   const [tasks, setTasks] = useState([]);
   const [role, setRole] = useState(null);
+  const [editingTask, setEditingTask] = useState(null); // Task being edited
 
   // Fetch user role and tasks
   const fetchData = async () => {
     try {
-      // Fetch the logged-in user's role
       const userResponse = await axios.get('/auth/me', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      setRole(userResponse.data.role); // Set role from response
+      setRole(userResponse.data.role);
 
-      // Fetch tasks
       const tasksResponse = await axios.get('/tasks', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
@@ -25,10 +25,12 @@ const Dashboard = () => {
     }
   };
 
-  // Handle task status change
+  useEffect(() => {
+    fetchData();
+  }, []);
+
   const handleTaskStatusChange = async (taskId, newStatus) => {
     try {
-      // Update task status in the backend
       await axios.put(
         `/tasks/${taskId}`,
         { status: newStatus },
@@ -37,7 +39,6 @@ const Dashboard = () => {
         }
       );
 
-      // Update task status locally
       setTasks((prevTasks) =>
         prevTasks.map((task) =>
           task._id === taskId ? { ...task, status: newStatus } : task
@@ -48,38 +49,40 @@ const Dashboard = () => {
     }
   };
 
-  // Handle edit task (for example, open modal for editing)
-  const handleEditTask = (taskId) => {
-    console.log('Edit Task:', taskId);
-    // Implement your edit logic here (e.g., open a modal for editing the task)
+  const handleEditTask = (task) => {
+    setEditingTask(task);
   };
 
-  // Handle delete task
+  const saveEditedTask = async (updatedTask) => {
+    try {
+      const response = await axios.put(`/tasks/${updatedTask._id}`, updatedTask, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+
+      setTasks((prevTasks) =>
+        prevTasks.map((task) => (task._id === updatedTask._id ? response.data : task))
+      );
+      setEditingTask(null);
+      alert('Task updated successfully!');
+    } catch (error) {
+      console.error('Error updating task:', error.response || error.message);
+    }
+  };
+
   const handleDeleteTask = async (taskId) => {
     if (!window.confirm('Are you sure you want to delete this task?')) return;
 
     try {
-      // Delete task in the backend
       await axios.delete(`/tasks/${taskId}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
 
-      // Remove the task from local state
       setTasks((prevTasks) => prevTasks.filter((task) => task._id !== taskId));
       alert('Task deleted successfully!');
     } catch (error) {
       console.error('Error deleting task:', error.response || error.message);
     }
   };
-
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    console.log('Role:', role); // Should print "admin" or "user"
-  }, [role]);
-  
 
   return (
     <div className="container mx-auto mt-8">
@@ -95,11 +98,19 @@ const Dashboard = () => {
               task={task}
               role={role}
               onTaskStatusChange={handleTaskStatusChange}
-              onEditTask={handleEditTask}
+              onEditTask={() => handleEditTask(task)}
               onDeleteTask={handleDeleteTask}
             />
           ))}
         </div>
+      )}
+
+      {editingTask && (
+        <EditTaskModal
+          task={editingTask}
+          onSave={saveEditedTask}
+          onClose={() => setEditingTask(null)}
+        />
       )}
     </div>
   );

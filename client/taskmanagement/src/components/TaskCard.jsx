@@ -4,6 +4,7 @@ import { MdDeleteOutline } from "react-icons/md";
 
 const TaskCard = ({ task, role, onTaskStatusChange, onEditTask, onDeleteTask }) => {
   const [isCompleted, setIsCompleted] = useState(task.status === 'completed');
+  
 
   const handleCheckboxChange = () => {
     const newStatus = !isCompleted ? 'completed' : 'pending';
