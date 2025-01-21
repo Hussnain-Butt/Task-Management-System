@@ -2,14 +2,10 @@ const User = require('../models/User');
 
 exports.getAllUsers = async (req, res) => {
   try {
-    // Use req.user.id to fetch user details from the database
-    const user = await User.findById(req.user.id).select('name email role');
-    if (!user) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.status(200).json(user); // Return user details including role
+    const users = await User.find().select('name email _id'); // Fetch users with only required fields
+    res.status(200).json(users); // Return an array of users
   } catch (error) {
-    console.error('Error fetching user:', error);
-    res.status(500).json({ error: 'Failed to fetch user' });
+    console.error('Error fetching users:', error.message);
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 };

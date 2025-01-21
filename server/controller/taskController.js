@@ -5,34 +5,37 @@ exports.createTask = async (req, res) => {
   try {
     const { title, subtasks, assignedTo, deadline, bgColor } = req.body;
 
-    console.log('Request Body:', req.body); // Debug the incoming request
+    if (!assignedTo) {
+      return res.status(400).json({ error: 'Assigned user is required' });
+    }
 
     const task = await Task.create({
       title,
       subtasks,
       assignedTo,
       deadline,
-      bgColor, // Save the background color
+      bgColor,
     });
 
     res.status(201).json(task);
   } catch (error) {
-    console.error('Error creating task:', error); // Log the error
+    console.error('Error creating task:', error.message);
     res.status(500).json({ error: 'Failed to create task' });
   }
 };
 
   
-  
-
 exports.getTasks = async (req, res) => {
-    try {
-      const tasks = await Task.find().populate('assignedTo', 'name email'); // Fetch user name and email
-      res.json(tasks);
-    } catch (err) {
-      res.status(500).json({ error: 'Error fetching tasks' });
-    }
-  };
+  try {
+    // Fetch tasks assigned to the logged-in user
+    const tasks = await Task.find({ assignedTo: req.user._id });
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error('Error fetching tasks:', error.message);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+};
+
 
   exports.updateTask = async (req, res) => {
     try {

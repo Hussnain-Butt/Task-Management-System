@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from '../services/api';
 
 const AdminPanel = () => {
-  const [users, setUsers] = useState([]);
+  const [users, setUsers] = useState([]); // Ensure users is initialized as an array
   const [taskGroup, setTaskGroup] = useState({
     title: '',
     subtasks: ['', '', '', ''],
@@ -17,9 +17,14 @@ const AdminPanel = () => {
       const response = await axios.get('/auth/users', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
-      setUsers(response.data || []);
+  
+      console.log('Users Response:', response.data); // Debug the response
+  
+      // Ensure the response is an array
+      setUsers(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching users:', error.response || error.message);
+      setUsers([]); // Fallback to an empty array in case of an error
     }
   };
 
@@ -28,6 +33,11 @@ const AdminPanel = () => {
   }, []);
 
   const createTaskGroup = async () => {
+    if (!taskGroup.assignedTo) {
+      alert('Please select a user to assign the task!');
+      return;
+    }
+
     try {
       const payload = {
         title: taskGroup.title,
@@ -36,6 +46,8 @@ const AdminPanel = () => {
         deadline: taskGroup.deadline,
         bgColor: taskGroup.bgColor,
       };
+
+      console.log('Request Body:', payload);
 
       await axios.post('/tasks', payload, {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
@@ -79,23 +91,26 @@ const AdminPanel = () => {
             />
           </div>
         ))}
+<div className="mb-6">
+  <label className="block text-gray-700 font-semibold mb-2">Assign To</label>
+  <select
+    className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+    onChange={(e) => setTaskGroup({ ...taskGroup, assignedTo: e.target.value })}
+    value={taskGroup.assignedTo}
+  >
+    <option value="">Select a User</option>
+    {users.length > 0 ? (
+      users.map((user) => (
+        <option key={user._id} value={user._id}>
+          {user.name}
+        </option>
+      ))
+    ) : (
+      <option disabled>No users available</option>
+    )}
+  </select>
+</div>
 
-        <div className="mb-6">
-          <label className="block text-gray-700 font-semibold mb-2">Assign To</label>
-          <select
-            className="w-full p-3 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            onChange={(e) => setTaskGroup({ ...taskGroup, assignedTo: e.target.value })}
-            value={taskGroup.assignedTo}
-          >
-            <option value="">Select a User</option>
-            {Array.isArray(users) &&
-              users.map((user) => (
-                <option key={user._id} value={user._id}>
-                  {user.name}
-                </option>
-              ))}
-          </select>
-        </div>
 
         <div className="mb-6">
           <label className="block text-gray-700 font-semibold mb-2">Deadline</label>
