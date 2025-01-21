@@ -11,7 +11,7 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       // Fetch the logged-in user's role
-      const userResponse = await axios.get('https://task-management-system-frontend-phi.vercel.app/auth/users',{
+      const userResponse = await axios.get('/auth/users ', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setRole(userResponse.data.role); // Set role from response

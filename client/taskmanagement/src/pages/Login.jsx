@@ -12,7 +12,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post('https://task-management-system-frontend-phi.vercel.app/auth/login')
+      const response = await axios.post('/auth/login', formData);
       localStorage.setItem('token', response.data.token);
       setAuth({ user: response.data.user, token: response.data.token }); // Update AuthContext
       navigate('/'); // Redirect to dashboard
