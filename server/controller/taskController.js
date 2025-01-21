@@ -24,11 +24,39 @@ exports.createTask = async (req, res) => {
   }
 };
 
+exports.getAllTasks = async (req, res) => {
+  try {
+    // Ensure only admins can access this
+    if (req.user.role !== 'admin') {
+      return res.status(403).json({ error: 'Access denied' });
+    }
+
+    // Fetch all tasks with user details
+    const tasks = await Task.find()
+      .populate('assignedTo', 'name email') // Populate user details (name and email)
+      .exec();
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.error('Error fetching tasks:', error.message);
+    res.status(500).json({ error: 'Failed to fetch tasks' });
+  }
+};
   
 exports.getTasks = async (req, res) => {
   try {
-    // Fetch tasks assigned to the logged-in user
-    const tasks = await Task.find({ assignedTo: req.user._id });
+    const user = req.user; // The logged-in user object populated by the `protect` middleware
+
+    let tasks;
+
+    if (user.role === 'admin') {
+      // Admin sees all tasks
+      tasks = await Task.find().populate('assignedTo', 'name email');
+    } else {
+      // Regular user sees only tasks assigned to them
+      tasks = await Task.find({ assignedTo: user._id }).populate('assignedTo', 'name email');
+    }
+
     res.status(200).json(tasks);
   } catch (error) {
     console.error('Error fetching tasks:', error.message);

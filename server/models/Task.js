@@ -8,7 +8,8 @@ const TaskSchema = new mongoose.Schema({
       status: { type: String, enum: ['pending', 'completed'], default: 'pending' },
     },
   ],
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Ensure assignedTo is required
+  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  assignedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, // Admin who assigned the task
   deadline: { type: Date },
   bgColor: { type: String, default: '#F9F9C5' },
 });
