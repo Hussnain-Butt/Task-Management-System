@@ -10,7 +10,7 @@ const Dashboard = () => {
   const fetchData = async () => {
     try {
       // Fetch the logged-in user's role
-      const userResponse = await axios.get('/auth/users', {
+      const userResponse = await axios.get('/auth/me', {
         headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
       });
       setRole(userResponse.data.role); // Set role from response
@@ -75,6 +75,11 @@ const Dashboard = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    console.log('Role:', role); // Should print "admin" or "user"
+  }, [role]);
+  
 
   return (
     <div className="container mx-auto mt-8">

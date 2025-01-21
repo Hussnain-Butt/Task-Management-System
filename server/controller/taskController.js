@@ -45,15 +45,12 @@ exports.getAllTasks = async (req, res) => {
   
 exports.getTasks = async (req, res) => {
   try {
-    const user = req.user; // The logged-in user object populated by the `protect` middleware
-
+    const user = req.user;
     let tasks;
 
     if (user.role === 'admin') {
-      // Admin sees all tasks
-      tasks = await Task.find().populate('assignedTo', 'name email');
+      tasks = await Task.find().populate('assignedTo', 'name email'); // Populate assigned user details
     } else {
-      // Regular user sees only tasks assigned to them
       tasks = await Task.find({ assignedTo: user._id }).populate('assignedTo', 'name email');
     }
 
