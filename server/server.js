@@ -8,11 +8,13 @@ dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
-
+app.use(express.static(path.join(__dirname, 'dist')));
 // Database Connection
 const connectDB = require('./config/db');
 connectDB();
-
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+  });
 // Routes
 app.use('/api/auth', require('./routes/user'));
 app.use('/api/auth', require('./routes/auth'));
