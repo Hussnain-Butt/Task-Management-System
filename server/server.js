@@ -6,11 +6,20 @@ const cors = require('cors');
 // Config
 dotenv.config();
 const app = express();
+const allowedOrigins = ['http://localhost:5173', 'http://172.236.98.211'];
 app.use(cors({
-    origin: 'http://172.236.98.211',
-    methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-}));
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g., Postman)
+      if (!origin) return callback(null, true);
+  
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true, // If you are using cookies or credentials
+  }));
 app.use(express.json());
 app.use((req, res, next) => {
     console.log('Request Body:', req.body);
