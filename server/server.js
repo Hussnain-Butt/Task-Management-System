@@ -6,7 +6,9 @@ const cors = require('cors');
 // Config
 dotenv.config();
 const app = express();
-app.use(cors());
+app.use(cors({
+    origin: 'http://172.236.98.211'
+}));
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'dist')));
 // Database Connection
