@@ -23,6 +23,8 @@ const Dashboard = () => {
     } catch (error) {
       console.error('Error fetching data:', error.response || error.message);
     }
+    console.log("tasks",tasks);
+    
   };
 
   useEffect(() => {
