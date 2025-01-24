@@ -38,8 +38,6 @@ exports.register = async (req, res) => {
         return res.status(400).json({ error: 'Invalid email or password' });
       }
   
-      console.log('User Found:', user);
-  
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
         console.log('Password mismatch');
@@ -50,22 +48,12 @@ exports.register = async (req, res) => {
         expiresIn: '1d',
       });
       console.log('Login successful');
-      res.json({
-        token,
-        user: {
-          id: user._id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-          profilePicture: user.profilePicture,
-        },
-      });
+      return res.status(200).json({ token, user });
     } catch (err) {
-      console.error('Error logging in:', err);
-      res.status(500).json({ error: 'Error logging in' });
+      console.error('Error:', err);
+      return res.status(500).json({ error: 'Internal server error' });
     }
   };
-  
   
   
   exports.getMe = async (req, res) => {

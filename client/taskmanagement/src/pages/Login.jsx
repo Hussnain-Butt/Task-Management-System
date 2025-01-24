@@ -12,6 +12,7 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
+      console.log(formData);
       const response = await axios.post('/auth/login', formData);
       localStorage.setItem('token', response.data.token);
       setAuth({ user: response.data.user, token: response.data.token }); // Update AuthContext
